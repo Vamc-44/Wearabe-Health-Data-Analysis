@@ -1,25 +1,23 @@
+# Import necessary libraries
 import xml.etree.ElementTree as ET
 import pandas as pd
 
-def parse_xml_to_dataframe(xml_file):
-    #Parse the XML file
+# Load and parse the XML file
+def parse_sleep_data(xml_file):
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
-    #Initialize a list to hold the data
     sleep_data = []
 
-    #Iterate through each 'record' element in the XML
     for record in root.findall("Record"):
-        row = {
-            "type": record.get("type"),
-            "startDate": record.get("startDate"),
-            "endDate": record.get("endDate"),
-            "value": record.get("value"),
-        }
-        sleep_data.append(row)
+        if record.get("type") == "HKCategoryTypeIdentifierSleepAnalysis":
+            start_time = record.get("startDate")
+            end_time = record.get("endDate")
+            value = record.get("value")  # Can be "Asleep", "Awake", etc.
 
-    #Convert the list of dictionaries to a DataFrame
+            sleep_data.append({"Start Time": start_time, "End Time": end_time, "Sleep Type": value})
+
+    # Convert to Pandas DataFrame
     df = pd.DataFrame(sleep_data)
-
     return df
+
